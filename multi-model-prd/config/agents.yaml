@@ -1,0 +1,25 @@
+agents:
+  - name: "agent_01"
+    model_ref: "gpt4o_model"
+    display_name: "Agent 01"
+    description: "通用智能体 01"
+    enabled: true
+
+  - name: "agent_02"
+    model_ref: "claude35_model"
+    display_name: "Agent 02"
+    description: "通用智能体 02"
+    enabled: true
+
+  - name: "agent_03"
+    model_ref: "deepseek_model"
+    display_name: "Agent 03"
+    description: "通用智能体 03"
+    enabled: true
+
+  - name: "moderator"
+    model_ref: "cheap_model"
+    display_name: "主持人"
+    description: "讨论主持人"
+    is_moderator: true
+    enabled: true

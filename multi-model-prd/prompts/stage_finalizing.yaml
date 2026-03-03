@@ -1,0 +1,41 @@
+stage_name: "finalizing"
+description: "文档生成阶段"
+
+objectives:
+  - "将 PRD 草稿标准化"
+  - "生成最终格式文档"
+  - "支持 Markdown/PDF 导出"
+
+instructions: |
+  1. 主持人指定一个 Agent 作为文档撰写者
+  2. 撰写者将 PRD 草稿标准化为最终输出格式：
+     - 添加文档元信息（版本、日期等）
+     - 确保格式统一
+     - 生成目录
+  3. 其他 Agent 可对文档格式提出最终建议
+  4. 生成最终 PRD 文档
+
+max_turns: 1
+
+output_format: |
+  ---
+  title: [产品名称] 产品需求文档
+  version: 1.0.0
+  date: YYYY-MM-DD
+  authors: [作者列表]
+  ---
+
+  # [产品名称] 产品需求文档
+
+  ## 目录
+  1. [目录项]
+  ...
+
+  ## 1. 背景与目标
+  ...
+
+  ## 2. 功能列表
+  ...
+
+  ## 3. 功能详述
+  ...

@@ -1,0 +1,34 @@
+discussion:
+  max_turns_per_stage:
+    elicitation: 5
+    design: 10
+    writing: 10
+    finalizing: 1
+  consensus_threshold: 0.8
+  context_compression:
+    enabled: true
+    trigger_after_turns: 5
+    max_context_tokens: 100000
+
+memory:
+  redis:
+    url: "${REDIS_URL}"
+    ttl: 86400
+  vector_db:
+    provider: "chroma"
+    collection: "prd_history"
+    embedding_model: "text-embedding-3-small"
+
+output:
+  default_format: "markdown"
+  supported_formats:
+    - "markdown"
+    - "pdf"
+  template_dir: "prompts/"
+
+app:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  cors_origins:
+    - "*"
