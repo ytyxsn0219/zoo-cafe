@@ -9,6 +9,7 @@ from ..models.gateway import ModelGateway, get_gateway
 from ..models.registry import ModelRegistry, get_model_registry
 from ..utils.logger import get_agent_logger
 from ..utils.prompt_loader import get_prompt_loader
+from ..tools import get_tool_registry
 
 
 @dataclass
@@ -52,6 +53,7 @@ class AgentConfig:
     temperature: float = 0.7
     max_tokens: int = 4096
     timeout: int = 60
+    enabled_tools: Optional[list[str]] = None  # 启用的工具列表
 
 
 class BaseAgent(ABC):
@@ -194,6 +196,84 @@ class BaseAgent(ABC):
             token_usage=response.token_usage,
             latency_ms=round(response.latency_ms, 2),
         )
+
+        return message
+
+    async def speak_with_tools(
+        self,
+        context: list[dict[str, str]],
+        stage: str = "",
+        round_num: int = 0,
+        role_hint: Optional[str] = None,
+    ) -> AgentMessage:
+        """
+        Agent speaks with tool calling capability.
+
+        Args:
+            context: Discussion context
+            stage: Current discussion stage
+            round_num: Current round number
+            role_hint: Optional role hint
+
+        Returns:
+            AgentMessage with response
+        """
+        # Build messages
+        system_prompt = self.get_system_prompt()
+
+        if role_hint:
+            system_prompt += f"\n\n当前任务：{role_hint}"
+
+        # Add tool usage instructions
+        if self.config.enabled_tools:
+            system_prompt += "\n\n你可以使用以下工具来帮助你完成任务："
+            for tool_name in self.config.enabled_tools:
+                system_prompt += f"\n- {tool_name}"
+
+        messages = [
+            {"role": "system", "content": system_prompt}
+        ] + context
+
+        model_string = self.registry.get_model_string(self.config.model_ref)
+        if not model_string:
+            raise ValueError(f"Model not found: {self.config.model_ref}")
+
+        # Get tool definitions
+        tool_registry = get_tool_registry()
+        tool_definitions = tool_registry.get_tools_for_agent(self.config.enabled_tools)
+
+        # Execute with function calling
+        async def execute_tool(tool_name: str, arguments: dict[str, Any]) -> Any:
+            tool = tool_registry.get(tool_name)
+            if not tool:
+                return {"error": f"Tool not found: {tool_name}"}
+            return await tool.execute(**arguments)
+
+        response = await self.gateway.chat_completion_with_function_calling(
+            model=model_string,
+            messages=messages,
+            tools=tool_definitions,
+            execute_tool_func=execute_tool,
+            temperature=self.config.temperature,
+            max_tokens=self.config.max_tokens,
+            timeout=self.config.timeout,
+        )
+
+        message = AgentMessage(
+            agent_name=self.config.name,
+            agent_role=role_hint or "participant",
+            content=response.content,
+            model_used=self.config.model_ref,
+            stage=stage,
+            round_num=round_num,
+            token_usage=response.token_usage,
+        )
+
+        self._history.append({
+            "role": "assistant",
+            "name": self.config.name,
+            "content": response.content,
+        })
 
         return message
 

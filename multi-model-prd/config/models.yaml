@@ -1,44 +1,46 @@
 models:
-  - name: "gpt4o_model"
-    provider: "openai"
-    model: "gpt-4o"
-    description: "OpenAI GPT-4o"
+  # GLM 模型 - 支持 Function Calling
+  - name: "glm_4"
+    provider: "zhipuai"
+    model: "glm-4"
+    description: "智谱GLM-4，支持工具调用"
     config:
       temperature: 0.7
-      max_tokens: 4096
-      timeout: 60
-      retry:
-        max_attempts: 3
-        backoff_factor: 2
-
-  - name: "claude35_model"
-    provider: "anthropic"
-    model: "claude-3-5-sonnet-20241022"
-    description: "Anthropic Claude 3.5 Sonnet"
-    config:
-      temperature: 0.5
-      max_tokens: 8192
-      timeout: 90
-      retry:
-        max_attempts: 3
-        backoff_factor: 2
-
-  - name: "deepseek_model"
-    provider: "deepseek"
-    model: "deepseek-reasoner"
-    description: "DeepSeek Reasoner"
-    config:
-      temperature: 0.5
       max_tokens: 4096
       timeout: 120
       retry:
         max_attempts: 3
         backoff_factor: 2
 
-  - name: "cheap_model"
-    provider: "openai"
-    model: "gpt-4o-mini"
-    description: "OpenAI GPT-4o-mini (低成本)"
+  - name: "glm_4_plus"
+    provider: "zhipuai"
+    model: "glm-4-plus"
+    description: "智谱GLM-4 Plus，支持工具调用"
+    config:
+      temperature: 0.7
+      max_tokens: 4096
+      timeout: 120
+      retry:
+        max_attempts: 3
+        backoff_factor: 2
+
+  - name: "glm_4_flash"
+    provider: "zhipuai"
+    model: "glm-4-flash"
+    description: "智谱GLM-4 Flash，快速响应"
+    config:
+      temperature: 0.7
+      max_tokens: 4096
+      timeout: 60
+      retry:
+        max_attempts: 2
+        backoff_factor: 1
+
+  # 备用低成本模型
+  - name: "glm_3_turbo"
+    provider: "zhipuai"
+    model: "glm-3-turbo"
+    description: "智谱GLM-3 Turbo"
     config:
       temperature: 0.3
       max_tokens: 2000
